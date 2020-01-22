@@ -96,7 +96,8 @@ const setupBuffers = (gl) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
   // 버텍스 정의. 1 ~ -1
-  // z좌표를 이동하면, 수직으로 서는 모양이 되어서 사라짐, How??
+  // z좌표를 클리핑 되게 (1 보다 크게 or -1보다 작게) 이동시키면 사라진다.
+  // 1 ~ -1 을 넘어서면 제거한다.
   const triangleVertices = [
      0.0,  0.5, 0.0,
     -0.5, -0.5, 0.0,
@@ -114,7 +115,8 @@ const draw = (gl, shaderProgram, vertexBuffer) => {
   // viewport설정, 그리기 버퍼에 그려지는 랜더링 결과의 위치 결정
   // WebGL Context생성시, 원점 0.0 넓이, 높이가 canvas와 동일한 크기로 설정, viewport설정으로 크기 & 위치 조정됨
   // gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-  gl.viewport(gl.viewportWidth / 2, gl.viewportHeight / 2, gl.viewportWidth / 2, gl.viewportHeight / 2);
+  // gl.viewport(low-left-x 캔버스의, low-left-y 캔버스의, webgl판의 w 크기, webgl판의 h 크기)
+  gl.viewport(0, 0, gl.viewportWidth / 2, gl.viewportHeight / 2);
 
   // gl.clearColor()함수로 설정된 값으로 색상 버퍼를 채움
   gl.clear(gl.COLOR_BUFFER_BIT);
