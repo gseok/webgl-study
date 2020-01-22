@@ -112,10 +112,9 @@ const setupBuffers = (gl) => {
 
 const draw = (gl, shaderProgram, vertexBuffer) => {
   // viewport설정, 그리기 버퍼에 그려지는 랜더링 결과의 위치 결정
-  // WebGL Context생성시, 원점 0.0 넓이, 높이가 canvas와 동일한 크기로 설정
+  // WebGL Context생성시, 원점 0.0 넓이, 높이가 canvas와 동일한 크기로 설정, viewport설정으로 크기 & 위치 조정됨
   // gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
   gl.viewport(gl.viewportWidth / 2, gl.viewportHeight / 2, gl.viewportWidth / 2, gl.viewportHeight / 2);
-
 
   // gl.clearColor()함수로 설정된 값으로 색상 버퍼를 채움
   gl.clear(gl.COLOR_BUFFER_BIT);
