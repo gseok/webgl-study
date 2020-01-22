@@ -55,6 +55,7 @@ const setupShaders = (gl) => {
       }
     `;
 
+  // 아래 gl_FragColor 값으로 삼각형의 색상 변경 가능, 아래코드에서는 빨강색 + alpha로 분홍색 표현함
   const fragmentShaderSource =
     `
       precision mediump float;
@@ -83,7 +84,7 @@ const setupShaders = (gl) => {
   // WebGL에는 고정된 수량의 attribute slot이 있음.
   shaderProgram.vertexPositionAttribute =
     gl.getAttribLocation(shaderProgram, ATTRIBUTE_VERTEX_POSITION_NAME);
-  
+
   // getAttribLocation는 자동으로 인덱스 지정하고, 지정된 인덱스를 리턴해줌
   // gl.bindAttribLocation() 은 링크 전에 인덱스 지정 가능
 
@@ -95,6 +96,7 @@ const setupBuffers = (gl) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
   // 버텍스 정의. 1 ~ -1
+  // z좌표를 이동하면, 수직으로 서는 모양이 되어서 사라짐, How??
   const triangleVertices = [
      0.0,  0.5, 0.0,
     -0.5, -0.5, 0.0,
@@ -111,7 +113,9 @@ const setupBuffers = (gl) => {
 const draw = (gl, shaderProgram, vertexBuffer) => {
   // viewport설정, 그리기 버퍼에 그려지는 랜더링 결과의 위치 결정
   // WebGL Context생성시, 원점 0.0 넓이, 높이가 canvas와 동일한 크기로 설정
-  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+  // gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+  gl.viewport(gl.viewportWidth / 2, gl.viewportHeight / 2, gl.viewportWidth / 2, gl.viewportHeight / 2);
+
 
   // gl.clearColor()함수로 설정된 값으로 색상 버퍼를 채움
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -131,16 +135,24 @@ const draw = (gl, shaderProgram, vertexBuffer) => {
   gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.numberOfItems);
 }
 
+function logGLCall (functionName, args) {
+  // console.log('gl.' + functionName + '(' + WebGLDebugUtils.glFunctionArgsToString(functionName, args) + ')');
+}
+
+function throwOnGLError (err, funcName, args) {
+  throw new Error(WebGLDebugUtils.glEnumToString(err) + ' was caused by call to ' + funcName + ' ' + Object.keys(args).map((i) => `"${args[i]}"`));
+}
+
 const startup = () => {
   const canvas = document.createElement('canvas');
   canvas.width = 500;
   canvas.height = 500;
 
-  const gl = createGLContext(canvas);
+  const gl = WebGLDebugUtils.makeDebugContext(createGLContext(canvas), throwOnGLError, logGLCall);
   const shaderProgram = setupShaders(gl);
   const vertexBuffer = setupBuffers(gl);
 
-  gl.clearColor(1.0, 1.0, 1.0, 1.0); // 흰색
+  gl.clearColor(1.0, 1.0, 1.0, 1.0); // 배경화면 색상 변경 - 흰색
   draw(gl, shaderProgram, vertexBuffer);
 
   document.body.appendChild(canvas);
